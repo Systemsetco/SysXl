@@ -221,7 +221,7 @@ Contributions are welcome! Feel free to:
 
 ## 📧 Contact
 
-For questions or support, contact: **api@systemset.co**
+For questions or support, contact: **systemset.co@gmail.com**
 
 ## 📝 License
 
