@@ -25,11 +25,21 @@
       </div>
 
       <!-- Results Count -->
-      <div class="mb-4">
+      <div class="mb-4 flex items-center justify-between">
         <span class="text-sm text-gray-600">{{ resultsText }}</span>
+        
+        <!-- Reset Filter Button -->
+        <button 
+          v-if="selectedLetter"
+          @click="clearLetterFilter"
+          class="px-4 py-2 bg-gray-100 hover:bg-gray-200 text-gray-700 text-sm rounded-lg transition flex items-center gap-2"
+        >
+          <i class="bi bi-x-circle"></i>
+          Clear Filter
+        </button>
       </div>
 
-    <!-- Functions Table -->
+    <!-- Functions Table with Alphabet Headers -->
     <div class="bg-white border border-gray-200 rounded-lg overflow-hidden">
       <div class="overflow-x-auto">
         <table class="w-full">
@@ -55,18 +65,33 @@
                 Koi function nahi mila.
               </td>
             </tr>
-            <tr
-              v-for="func in filteredFunctions"
-              :key="func.name"
-              @click="selectedFunction = func"
-              class="function-row"
-            >
-              <td class="px-6 py-4 align-top font-medium">{{ func.name }}</td>
-              <td class="px-6 py-4 align-top">
-                <span class="category-badge px-2 py-1 rounded">{{ func.category }}</span>
-              </td>
-              <td class="px-6 py-4 align-top text-sm text-gray-700">{{ func.desc }}</td>
-            </tr>
+            
+            <!-- Grouped by Alphabet -->
+            <template v-for="(group, letter) in groupedFunctions" :key="letter">
+              <!-- Alphabet Header Row -->
+              <tr class="alphabet-header-row">
+                <td colspan="3" class="px-6 py-3 bg-gray-100 border-y border-gray-200">
+                  <div class="flex items-center gap-2">
+                    <div class="alphabet-header-letter">{{ letter }}</div>
+                    <div class="text-xs text-gray-500">({{ group.length }} functions)</div>
+                  </div>
+                </td>
+              </tr>
+              
+              <!-- Functions in this letter group -->
+              <tr
+                v-for="func in group"
+                :key="func.name"
+                @click="selectedFunction = func"
+                class="function-row"
+              >
+                <td class="px-6 py-4 align-top font-medium">{{ func.name }}</td>
+                <td class="px-6 py-4 align-top">
+                  <span class="category-badge px-2 py-1 rounded">{{ func.category }}</span>
+                </td>
+                <td class="px-6 py-4 align-top text-sm text-gray-700">{{ func.desc }}</td>
+              </tr>
+            </template>
           </tbody>
         </table>
       </div>
@@ -130,11 +155,37 @@ const filteredFunctions = computed(() => {
   });
 });
 
+// Group functions by starting letter (iOS Contacts style)
+const groupedFunctions = computed(() => {
+  const groups = {};
+  
+  filteredFunctions.value.forEach(func => {
+    const firstLetter = func.name.charAt(0).toUpperCase();
+    if (!groups[firstLetter]) {
+      groups[firstLetter] = [];
+    }
+    groups[firstLetter].push(func);
+  });
+  
+  // Sort groups alphabetically
+  return Object.keys(groups)
+    .sort()
+    .reduce((sorted, key) => {
+      sorted[key] = groups[key];
+      return sorted;
+    }, {});
+});
+
 // Handle letter selection from alphabet index
 const handleLetterSelected = (letter) => {
   selectedLetter.value = letter;
   // Clear search when using alphabet index
   searchQuery.value = '';
+};
+
+// Clear letter filter
+const clearLetterFilter = () => {
+  selectedLetter.value = '';
 };
 
 // Results text
@@ -220,5 +271,21 @@ watch(searchQuery, () => {
   .search-input {
     font-size: 0.875rem;
   }
+}
+
+/* Alphabet section headers */
+.alphabet-header-row {
+  cursor: default;
+}
+
+.alphabet-header-row:hover {
+  background-color: #f9fafb !important;
+}
+
+.alphabet-header-letter {
+  font-size: 1.25rem;
+  font-weight: 700;
+  color: #1f2937;
+  font-family: 'Geist', sans-serif;
 }
 </style>
