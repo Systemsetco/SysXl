@@ -74,6 +74,9 @@
 
     <!-- Function Modal -->
     <FunctionModal v-model="selectedFunction" />
+
+    <!-- Alphabet Index Navigator -->
+    <AlphabetIndex @letterSelected="handleLetterSelected" />
     </div>
   </div>
 </template>
@@ -83,10 +86,12 @@ import { ref, computed, watch } from 'vue';
 import { excelFormulas } from '../data/functions.js';
 import CategoryFilter from '../components/CategoryFilter.vue';
 import FunctionModal from '../components/FunctionModal.vue';
+import AlphabetIndex from '../components/AlphabetIndex.vue';
 
 const searchQuery = ref('');
 const currentCategory = ref('all');
 const selectedFunction = ref(null);
+const selectedLetter = ref('');
 
 // Get unique categories + add 'Most Used'
 const categories = computed(() => {
@@ -94,9 +99,16 @@ const categories = computed(() => {
   return ['all', 'Most Used', ...Array.from(cats).sort((a, b) => a.localeCompare(b))];
 });
 
-// Filter functions based on search and category
+// Filter functions based on search, category, and letter
 const filteredFunctions = computed(() => {
   return excelFormulas.filter(func => {
+    // Letter filter (from alphabet index)
+    if (selectedLetter.value) {
+      if (!func.name.toUpperCase().startsWith(selectedLetter.value)) {
+        return false;
+      }
+    }
+
     // Category filter
     if (currentCategory.value === 'Most Used') {
       if (!func.mostUsed) return false;
@@ -118,11 +130,25 @@ const filteredFunctions = computed(() => {
   });
 });
 
+// Handle letter selection from alphabet index
+const handleLetterSelected = (letter) => {
+  selectedLetter.value = letter;
+  // Clear search when using alphabet index
+  searchQuery.value = '';
+};
+
 // Results text
 const resultsText = computed(() => {
   const count = filteredFunctions.value.length;
-  const catText = currentCategory.value !== 'all' ? ` in ${currentCategory.value}` : '';
-  return `${count} result${count !== 1 ? 's' : ''}${catText}`;
+  let text = `${count} result${count !== 1 ? 's' : ''}`;
+  
+  if (selectedLetter.value) {
+    text += ` starting with ${selectedLetter.value}`;
+  } else if (currentCategory.value !== 'all') {
+    text += ` in ${currentCategory.value}`;
+  }
+  
+  return text;
 });
 
 // Debounced search - using a simple timeout
@@ -130,7 +156,10 @@ let searchTimeout = null;
 watch(searchQuery, () => {
   clearTimeout(searchTimeout);
   searchTimeout = setTimeout(() => {
-    // The computed property will automatically update
+    // Clear letter filter when searching
+    if (searchQuery.value.trim()) {
+      selectedLetter.value = '';
+    }
   }, 180);
 });
 </script>

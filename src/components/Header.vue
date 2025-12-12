@@ -15,96 +15,155 @@
         <nav class="hidden md:flex items-center gap-6">
           <router-link 
             to="/" 
-            class="text-sm text-gray-600 hover:text-gray-900 transition flex items-center gap-1"
+            class="text-sm text-gray-600 hover:text-gray-900 transition"
             active-class="text-gray-900 font-medium"
           >
-            <i class="bi bi-table"></i>
-            <span>Functions</span>
+            Functions
           </router-link>
           <router-link 
             to="/docs" 
-            class="text-sm text-gray-600 hover:text-gray-900 transition flex items-center gap-1"
+            class="text-sm text-gray-600 hover:text-gray-900 transition"
             active-class="text-gray-900 font-medium"
           >
-            <i class="bi bi-book"></i>
-            <span>Documentation</span>
+            Documentation
           </router-link>
           <router-link 
             to="/api" 
-            class="text-sm text-gray-600 hover:text-gray-900 transition flex items-center gap-1"
+            class="text-sm text-gray-600 hover:text-gray-900 transition"
             active-class="text-gray-900 font-medium"
           >
-            <i class="bi bi-code-slash"></i>
-            <span>API</span>
+            API
           </router-link>
         </nav>
 
         <!-- Mobile Menu Button -->
         <button 
-          @click="mobileMenuOpen = !mobileMenuOpen"
+          @click="mobileMenuOpen = true"
           class="md:hidden text-gray-600 hover:text-gray-900 p-2"
-          aria-label="Toggle menu"
+          aria-label="Open menu"
         >
-          <i :class="mobileMenuOpen ? 'bi bi-x-lg text-xl' : 'bi bi-list text-2xl'"></i>
+          <i class="bi bi-list text-2xl"></i>
         </button>
       </div>
-
-      <!-- Mobile Navigation -->
-      <Transition name="mobile-menu">
-        <nav v-if="mobileMenuOpen" class="md:hidden mt-4 pb-2 space-y-2">
-          <router-link 
-            to="/" 
-            @click="mobileMenuOpen = false"
-            class="block text-sm text-gray-600 hover:text-gray-900 transition py-2 px-3 rounded flex items-center gap-2"
-            active-class="text-gray-900 font-medium bg-gray-50"
-          >
-            <i class="bi bi-table"></i>
-            <span>Functions</span>
-          </router-link>
-          <router-link 
-            to="/docs" 
-            @click="mobileMenuOpen = false"
-            class="block text-sm text-gray-600 hover:text-gray-900 transition py-2 px-3 rounded flex items-center gap-2"
-            active-class="text-gray-900 font-medium bg-gray-50"
-          >
-            <i class="bi bi-book"></i>
-            <span>Documentation</span>
-          </router-link>
-          <router-link 
-            to="/api" 
-            @click="mobileMenuOpen = false"
-            class="block text-sm text-gray-600 hover:text-gray-900 transition py-2 px-3 rounded flex items-center gap-2"
-            active-class="text-gray-900 font-medium bg-gray-50"
-          >
-            <i class="bi bi-code-slash"></i>
-            <span>API</span>
-          </router-link>
-        </nav>
-      </Transition>
     </div>
   </header>
+
+  <!-- Mobile Menu Modal -->
+  <Transition name="modal">
+    <div 
+      v-if="mobileMenuOpen" 
+      @click="closeOnOutside"
+      class="fixed inset-0 bg-black/30 z-50 md:hidden"
+    >
+      <div class="min-h-screen px-4 py-8 flex items-start justify-center pt-20">
+        <Transition name="modal-content">
+          <div 
+            v-if="mobileMenuOpen"
+            ref="menuContent"
+            class="bg-white rounded-lg w-full max-w-sm relative shadow-xl"
+          >
+            <button 
+              @click="mobileMenuOpen = false"
+              class="absolute top-4 right-4 text-gray-400 hover:text-gray-600 transition"
+            >
+              <i class="bi bi-x-lg text-xl"></i>
+            </button>
+            
+            <div class="p-6">
+              <h2 class="text-xl font-semibold mb-4 pr-8">Menu</h2>
+              <nav class="space-y-2">
+                <router-link 
+                  to="/" 
+                  @click="mobileMenuOpen = false"
+                  class="block text-base text-gray-700 hover:text-gray-900 hover:bg-gray-50 transition py-3 px-4 rounded"
+                  active-class="text-gray-900 font-medium bg-gray-50"
+                >
+                  Functions
+                </router-link>
+                <router-link 
+                  to="/docs" 
+                  @click="mobileMenuOpen = false"
+                  class="block text-base text-gray-700 hover:text-gray-900 hover:bg-gray-50 transition py-3 px-4 rounded"
+                  active-class="text-gray-900 font-medium bg-gray-50"
+                >
+                  Documentation
+                </router-link>
+                <router-link 
+                  to="/api" 
+                  @click="mobileMenuOpen = false"
+                  class="block text-base text-gray-700 hover:text-gray-900 hover:bg-gray-50 transition py-3 px-4 rounded"
+                  active-class="text-gray-900 font-medium bg-gray-50"
+                >
+                  API
+                </router-link>
+              </nav>
+            </div>
+          </div>
+        </Transition>
+      </div>
+    </div>
+  </Transition>
 </template>
 
 <script setup>
 import { ref } from 'vue';
 
 const mobileMenuOpen = ref(false);
+const menuContent = ref(null);
+
+// Close when clicking outside
+const closeOnOutside = (e) => {
+  if (menuContent.value && !menuContent.value.contains(e.target)) {
+    mobileMenuOpen.value = false;
+  }
+};
+
+// Close on Escape key
+const handleEscape = (e) => {
+  if (e.key === 'Escape' && mobileMenuOpen.value) {
+    mobileMenuOpen.value = false;
+  }
+};
+
+// Add/remove escape listener
+import { onMounted, onUnmounted } from 'vue';
+
+onMounted(() => {
+  document.addEventListener('keydown', handleEscape);
+});
+
+onUnmounted(() => {
+  document.removeEventListener('keydown', handleEscape);
+});
 </script>
 
 <style scoped>
-/* Mobile menu transitions */
-.mobile-menu-enter-active,
-.mobile-menu-leave-active {
+/* Modal transitions */
+.modal-enter-active,
+.modal-leave-active {
+  transition: opacity 0.3s ease;
+}
+
+.modal-enter-from,
+.modal-leave-to {
+  opacity: 0;
+}
+
+.modal-content-enter-active {
   transition: all 0.3s ease;
 }
 
-.mobile-menu-enter-from {
-  opacity: 0;
-  transform: translateY(-10px);
+.modal-content-leave-active {
+  transition: all 0.2s ease;
 }
 
-.mobile-menu-leave-to {
+.modal-content-enter-from {
   opacity: 0;
-  transform: translateY(-10px);
+  transform: scale(0.95);
+}
+
+.modal-content-leave-to {
+  opacity: 0;
+  transform: scale(0.95);
 }
 </style>

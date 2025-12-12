@@ -16,17 +16,17 @@
           <ul class="space-y-2">
             <li>
               <router-link to="/" class="text-sm text-gray-600 hover:text-primary transition">
-                <i class="bi bi-house-door me-2"></i>Functions
+                Functions
               </router-link>
             </li>
             <li>
               <router-link to="/docs" class="text-sm text-gray-600 hover:text-primary transition">
-                <i class="bi bi-book me-2"></i>Documentation
+                Documentation
               </router-link>
             </li>
             <li>
               <router-link to="/api" class="text-sm text-gray-600 hover:text-primary transition">
-                <i class="bi bi-code-slash me-2"></i>API Reference
+                API Reference
               </router-link>
             </li>
           </ul>

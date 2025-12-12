@@ -1,9 +1,10 @@
 <template>
-  <div class="max-w-5xl mx-auto px-4 sm:px-6 py-8 sm:py-12 flex-1">
-    <div class="mb-8">
-      <h1 class="text-3xl font-semibold text-gray-900 mb-2">API Reference</h1>
-      <p class="text-gray-600">REST API for Excel Functions data</p>
-    </div>
+  <div class="api-container">
+    <div class="api-content-wrapper">
+      <div class="mb-8">
+        <h1 class="text-3xl font-semibold text-gray-900 mb-2">API Reference</h1>
+        <p class="text-gray-600">REST API for Excel Functions data</p>
+      </div>
 
     <div class="space-y-6">
       <!-- API Overview -->
@@ -247,6 +248,7 @@ curl https://sysxl.netlify.app/api/v1/functions/category/Logical</code></pre>
         </p>
       </section>
     </div>
+    </div>
   </div>
 </template>
 
@@ -265,6 +267,22 @@ onMounted(() => {
 </script>
 
 <style scoped>
+/* Fixed width container to prevent layout shifts */
+.api-container {
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  background-color: #f9fafb;
+}
+
+.api-content-wrapper {
+  width: 100%;
+  max-width: 1280px;
+  margin: 0 auto;
+  padding: 3rem 1.5rem;
+  flex: 1;
+}
+
 .code-block {
   background: #1e1e1e;
   color: #d4d4d4;
@@ -272,6 +290,7 @@ onMounted(() => {
   padding: 1rem;
   overflow-x: auto;
   font-family: 'Cascadia Code', 'Monaco', 'Courier New', monospace;
+  border: 1px solid #333;
 }
 
 .code-block pre {
@@ -286,6 +305,10 @@ onMounted(() => {
 
 /* Mobile responsive styles */
 @media (max-width: 768px) {
+  .api-content-wrapper {
+    padding: 1.5rem 1rem;
+  }
+
   h1 {
     font-size: 1.875rem;
   }
@@ -314,6 +337,10 @@ onMounted(() => {
 }
 
 @media (max-width: 640px) {
+  .api-content-wrapper {
+    padding: 1rem 0.75rem;
+  }
+
   h1 {
     font-size: 1.5rem;
   }
